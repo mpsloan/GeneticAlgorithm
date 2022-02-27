@@ -90,6 +90,7 @@ public class GeneticAlgorithm {
                 }
             }
         }
+        
         // sorting the current generation with compareTo method
         Collections.sort(currentGen);
         // printing out the first chromosome in the current generation
