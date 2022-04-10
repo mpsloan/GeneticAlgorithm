@@ -17,6 +17,10 @@ import java.util.Collections;
 import java.util.Scanner;
 
 public class GeneticAlgorithm {
+    public static final int POP_SIZE = 100;
+    public static final int NUM_EPOCHS = 1000;
+    public static final int NUM_THREADS = 1;
+
     // method to read data from a file and add to ArrayList of type item
     public static ArrayList<Item> readData(String filename) throws FileNotFoundException {
         // creation of new file, ArrayList, and scanner to read file
