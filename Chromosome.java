@@ -9,6 +9,8 @@ implements Comparable<Chromosome> {
     // rng value used for frequent random number generation
     private static Random rng = new Random();
 
+    public static long dummy = 0;
+
     // empty constructor method because this class inherits ArrayList<Item>
     public Chromosome() {
 
@@ -79,6 +81,10 @@ implements Comparable<Chromosome> {
         double totalWeight = 0;
         int value = 0;
         int totalValue = 0;
+        dummy = 0;
+        for (int i=0; i < this.size()*1000; i++) {
+            dummy += i;
+        }
         // for loop to cycle along the size of the chromosome
         for (int i = 0; i < this.size(); i++) {
             weight = get(i).getWeight();

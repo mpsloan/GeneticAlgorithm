@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -7,7 +8,7 @@ import java.util.Scanner;
 public class GeneticAlgorithm {
     public static final int POP_SIZE = 100;
     public static final int NUM_EPOCHS = 1000;
-    public static final int NUM_THREADS = 1;
+    public static final int NUM_THREADS = 10;
 
     // method to read data from a file and add to ArrayList of type item
     public static ArrayList<Item> readData(String filename) throws FileNotFoundException {
@@ -31,9 +32,9 @@ public class GeneticAlgorithm {
     }
 
     // method that returns ArrayList of type chromosome based on population size passed in
-    public static ArrayList<Chromosome> initializePopulation(ArrayList<Item> items, int populationSize) {
+    public static ArrayList<Chromosome> initializePopulation(ArrayList<Item> items, int POP_SIZE) {
         ArrayList<Chromosome> chromosomes = new ArrayList<>();
-        for (int i = 0; i < populationSize; i++) {
+        for (int i = 0; i < POP_SIZE; i++) {
             // adding new chromosome objects to ArrayList
             Chromosome newChrom = new Chromosome(items);
             chromosomes.add(newChrom);
@@ -42,56 +43,30 @@ public class GeneticAlgorithm {
     }
 
     // main method
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
         /* initializing ArrayLists of type item and chromosome item type reads the designated text 
         file and adds the items to an array List while the other two ArrayLists account for the 
         current generation as well as the next generation */
         ArrayList<Item> items = readData("items.txt");
-        ArrayList<Chromosome> currentGen = initializePopulation(items, 10);
+        ArrayList<Chromosome> currentGen = new ArrayList<>();
         ArrayList<Chromosome> nextGen = new ArrayList<>();
+        ArrayList<GeneticThread> threads = new ArrayList<>();
+
+        for (int i = 0; i <  NUM_EPOCHS / NUM_THREADS; i++) {
+            GeneticThread thread = new GeneticThread(currentGen);
+            thread.start();
+            threads.add(thread);
+        }
+
+        for (GeneticThread t: threads) {
+            t.join();
+        }
         
-        // for loop to cycle through the steps for 20 generations
-        for (int l = 0; l < 20; l++) {
-            // for each loop to cycle through each of the current gen chromosomes and add them to next gen
-            for (Chromosome chromosome: currentGen) {
-                nextGen.add(chromosome);
-            }
-            
-            /* for loop to cycle through the current generation and add a child for every 2 parent chromomosomes via 
-            crossover */
-            for (int i = 0; i < currentGen.size() - 1; i+=2) {
-                Chromosome child = currentGen.get(i).crossover(currentGen.get(i+1));
-                nextGen.add(child);
-            }
-            
-            // randomMutation variable to get 10 percent of next generation
-            int randMut = nextGen.size() / 10;
-            // for loop to cycle through and mutate 10 percent of the next generation
-            for (int j = 0; j < randMut; j++) {
-                // randomly generating the index
-                int randIndex = (int) (Math.random() * nextGen.size()) + 0;
-                nextGen.get(randIndex).mutate();
-            }
-            
-            // sorting the next generation via the compareTo method in Chromosome class
-            Collections.sort(nextGen);
-            // clearing out the current generation
-            currentGen.clear();
-            
-            // initializing a limit to act as iteration variable and break for each loop
-            int limit = 0;
-            // for each loop to add the next generation of chromosomes to the current generation
-            for (Chromosome nextChrom: nextGen) {
-                currentGen.add(nextChrom);
-                // iterating limit
-                limit += 1;
-                // breaking out of loop once it cycles through top ten
-                if (limit >= 9) {
-                    break;
-                }
-                else {
-                    continue;
-                }
+        currentGen = threads.get(0).getCurrentGen();
+
+        for (GeneticThread t: threads) {
+            if (currentGen.get(0).getFitness() < t.getCurrentGen().get(0).getFitness()) {
+                currentGen = t.getCurrentGen();
             }
         }
         
