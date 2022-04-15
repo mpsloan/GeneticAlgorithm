@@ -1,42 +1,50 @@
-// BruteForce class that prints the best subset
+// BruteForce class that gets the best subset recursively and prints it to the console
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class BruteForce {
+    // getOptimalSet method passing in the items
     public static ArrayList<Item> getOptimalSet(ArrayList<Item> items) {
+        // if the size of the ArrayList is bigger than 10, throws exception
         if (items.size() > 10) {
             throw new IllegalArgumentException("Too many items in your ArrayList!");
         }
-
+        // if the size of the items is 0 or 1, it returns the list
         if (items.size() == 0 || items.size() == 1) {
             return items;
         }
-    
- 
-        // Run a loop for printing all 2^n
-        // subsets one by one
-        for (int i = 0; i < (1<<items.size()); i++)
-        {
-            System.out.print(i + "{ ");
- 
-            // Print current subset
-            for (int j = 0; j < items.size(); j++)
- 
-                // (1<<j) is a number with jth bit 1
-                // so when we 'and' them with the
-                // subset number we get which numbers
-                // are present in the subset and which
-                // are not
-                if ((i & (1 << j)) > 0)
-                    System.out.print(items.get(j) + " ");
- 
-            System.out.println("}");
+        // declaring the bestSubset to be the items before the process starts
+        ArrayList<Item> bestSubset = items;
+        // declaring bestFitness
+        int bestFitness = 0;
+        // for each loop that cycles through all the items in the list
+        for (Item i: items) {
+            // declaring a new list
+            ArrayList<Item> items2 = new ArrayList<>();
+            // making items2 a copy of items
+            for (int j = 0; j < items.size(); j++) {
+                items2.add(items.get(j));
+            }
+            // removing an item and then getting the optimal set
+            items2.remove(i);
+            items2 = getOptimalSet(items2);
+            /* if the fitness of items2 is better than best fitness, set bestSubset to items2
+            and the bestFitness to items2's fitness */
+            if (getFitness(items2) > bestFitness) {
+                bestSubset = items2;
+                bestFitness = getFitness(items2);
+            }
         }
-        return items;
+        /* checking if the fitness of items if greater than the best fitness
+        if it is, return items. If not then returning bestSubset */
+        if (getFitness(items) > bestFitness) {
+            return items;
+        }
+        return bestSubset;
     }       
-    
+    // getting fitness of item
     public static int getFitness(ArrayList<Item> items) {
         // intantiating variables before the for loop
         double weight = 0;
@@ -79,10 +87,8 @@ public class BruteForce {
             items.add(newItem);
         }
         scan.close();
-        // ArrayList<Item> optimal = getOptimalSet(items);
-        // // for (Item i: optimal) {
-        // //     System.out.println(i);
-        // // }
-        System.out.println(getOptimalSet(items));
+        // setting the optimal ArrayList
+        ArrayList<Item> optimal = getOptimalSet(items);
+        System.out.println(optimal+ "\nFitness: " +getFitness(optimal));
     }
 }
