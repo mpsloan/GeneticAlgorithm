@@ -1,10 +1,10 @@
+// BruteForce class that prints the best subset
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class BruteForce {
-
     public static ArrayList<Item> getOptimalSet(ArrayList<Item> items) {
         if (items.size() > 10) {
             throw new IllegalArgumentException("Too many items in your ArrayList!");
@@ -13,19 +13,30 @@ public class BruteForce {
         if (items.size() == 0 || items.size() == 1) {
             return items;
         }
-        ArrayList<Item> items2 = items;
-        ArrayList<Item> bestSubset = items;
-        int bestFitness = getFitness(items);
-
-        for (Item i: items) {
-            items2.remove(i);
-            items2 = getOptimalSet(items2);
-            if (getFitness(items2) > bestFitness) {
-                bestSubset = items2;
-            }
+    
+ 
+        // Run a loop for printing all 2^n
+        // subsets one by one
+        for (int i = 0; i < (1<<items.size()); i++)
+        {
+            System.out.print(i + "{ ");
+ 
+            // Print current subset
+            for (int j = 0; j < items.size(); j++)
+ 
+                // (1<<j) is a number with jth bit 1
+                // so when we 'and' them with the
+                // subset number we get which numbers
+                // are present in the subset and which
+                // are not
+                if ((i & (1 << j)) > 0)
+                    System.out.print(items.get(j) + " ");
+ 
+            System.out.println("}");
         }
-        return bestSubset;
-    }
+        return items;
+    }       
+    
     public static int getFitness(ArrayList<Item> items) {
         // intantiating variables before the for loop
         double weight = 0;
@@ -68,6 +79,10 @@ public class BruteForce {
             items.add(newItem);
         }
         scan.close();
+        // ArrayList<Item> optimal = getOptimalSet(items);
+        // // for (Item i: optimal) {
+        // //     System.out.println(i);
+        // // }
         System.out.println(getOptimalSet(items));
     }
 }

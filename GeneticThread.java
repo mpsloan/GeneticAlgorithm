@@ -1,3 +1,4 @@
+// thread class
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -5,33 +6,35 @@ import java.util.Collections;
 import java.util.Scanner;
 
 public class GeneticThread extends Thread {
-
+    // instantiating class fields
     private ArrayList<Chromosome> currentGen;
-    public static final int POP_SIZE = 100;
-    public static final int NUM_EPOCHS = 1000;
-    public static final int NUM_THREADS = 10;
+    private int numIterations;
 
-    public GeneticThread(ArrayList<Chromosome> currentGen) {
+    // setting them in the constructor to pass in, in main
+    public GeneticThread(ArrayList<Chromosome> currentGen, int iterations) {
         this.currentGen = currentGen;
+        this.numIterations = iterations;
     }
-
+    // run method that goes through the GeneticAlgorithm process
     public void run() {
         /* initializing ArrayLists of type item and chromosome item type reads the designated text 
         file and adds the items to an array List while the other two ArrayLists account for the 
         current generation as well as the next generation */
         ArrayList<Item> items = new ArrayList<>();
+        // try catch because run method can't throw exception
         try {
-            items = readData("items.txt");
+            items = readData("more_items.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        // instantiating current generation ArrayList and nextGen
         this.currentGen = initializePopulation(items, 10);
         ArrayList<Chromosome> nextGen = new ArrayList<>();
 
         
         
         // for loop to cycle through the steps for 20 generations
-        for (int l = 0; l < NUM_EPOCHS / NUM_THREADS; l++) {
+        for (int l = 0; l < numIterations; l++) {
             // for each loop to cycle through each of the current gen chromosomes and add them to next gen
             for (Chromosome chromosome: currentGen) {
                 nextGen.add(chromosome);
@@ -102,6 +105,7 @@ public class GeneticThread extends Thread {
     // method that returns ArrayList of type chromosome based on population size passed in
     public static ArrayList<Chromosome> initializePopulation(ArrayList<Item> items, int POP_SIZE) {
         ArrayList<Chromosome> chromosomes = new ArrayList<>();
+        // for loop that runs for however big population size should be
         for (int i = 0; i < POP_SIZE; i++) {
             // adding new chromosome objects to ArrayList
             Chromosome newChrom = new Chromosome(items);
@@ -109,7 +113,7 @@ public class GeneticThread extends Thread {
         }
         return chromosomes;
     }
-
+    // getter for the Chromosome in main method of GeneticAlgorithm class
     public ArrayList<Chromosome> getCurrentGen() {
         return this.currentGen;
     }
